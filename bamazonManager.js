@@ -48,6 +48,7 @@ function start() {
                 break;
             case "Add New Products":
                 // console.log("Adding a new product");
+                addNewProduct();
                 break;
             case "Delete Products":
                 console.log("Deleting a product");
@@ -202,6 +203,63 @@ function addInventory() {
 
     };
 };
+
+function addNewProduct() {
+    console.log("\n -------------------------------------------------------------------- \n");
+    Inquirer.prompt(
+        {
+            type: "input",
+            name: "name",
+            message: "What new product would you like to add? [Quit with Q]"
+        }
+    ).then(function (userInput) {
+        if (userInput["name"].toUpperCase() !== "Q") {
+            var product = {};
+            product["product_name"] = userInput["name"];
+            requestDept(product);
+
+        } else {
+            quitApp();
+        }
+
+    });
+
+    function requestDept(product) {
+        console.log("\n -------------------------------------------------------------------- \n");
+
+        var deptList = [];
+        connection.query("SELECT DISTINCT department_name FROM inventory", function (err, res) {
+            for (let i = 0; i < res.length; i++) {
+                deptList.push(res[i]["department_name"]);
+            }
+            // console.log(deptList)
+
+            Inquirer.prompt(
+                {
+                    type: "rawlist",
+                    name: "department",
+                    message: "What department should this go under? [Quit with Q]",
+                    choices: deptList
+                }
+            ).then(function (userInput) {
+                if (userInput["department"].toUpperCase() !== "Q") {
+                    product["department_name"] = userInput["department"];
+                    // console.log(product);
+    
+                    requestCost(product);
+    
+                } else {
+                    quitApp();
+                };
+            });
+        });
+    };
+};
+
+function requestCost(product){
+    console.log("\n -------------------------------------------------------------------- \n");
+    
+}
 
 
 function moreTasks() {
