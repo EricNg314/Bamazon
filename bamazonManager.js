@@ -108,7 +108,7 @@ function addInventory() {
                 validate: function (input) {
                     var checkID = false;
                     for (let j = 0; j < listOfID.length; j++) {
-                        if ((parseInt(input) === listOfID[j]) || (input.toUpperCase() === "Q")) {
+                        if ((parseFloat(input) === listOfID[j]) || (input.toUpperCase() === "Q")) {
                             checkID = true;
                         }
                     }
@@ -153,7 +153,7 @@ function addInventory() {
                     } else if (isNaN(input)) {
                         console.log("\n Error: " + input + " is not a number, please enter a number.");
                         return false;
-                    } else if(!Number.isInteger(input)){
+                    } else if (!(Number.isInteger(parseFloat(input)))) {
                         console.log("\n Error: " + input + " is NOT an integer");
                         return false;
                     } else {
@@ -163,11 +163,10 @@ function addInventory() {
                 }
             }
         ).then(function (userInput) {
-            if(userInput["quantity"].toUpperCase() !== "Q"){
+            if (userInput["quantity"].toUpperCase() !== "Q") {
                 var inputQty = parseInt(userInput["quantity"]);
                 updateQty(selectedItem, inputQty);
 
-        // connection.query("UPDATE inventory SET ? WHERE ?")
             } else {
                 quitApp();
             };
@@ -175,15 +174,52 @@ function addInventory() {
 
         });
     };
-    function updateQty(selectedItem, inputQty){
+
+    function updateQty(selectedItem, inputQty) {
+        console.log("\n -------------------------------------------------------------------- \n");
+        connection.query("UPDATE inventory SET ? WHERE ?",
+            [
+                {
+                    stock_quantity: selectedItem["stock_quantity"] + inputQty
+                },
+                {
+                    item_id: selectedItem["item_id"]
+                }
+            ]
+        )
+        connection.query("SELECT * FROM inventory WHERE ?",
+            {
+                item_id: selectedItem["item_id"]
+            }, function (err, res) {
+                if (err) throw err;
+
+                showSQLTable(res);
+                console.log(selectedItem["product_name"] + " has been successfully updated to " + res[0]["stock_quantity"]);
+
+                moreTasks();
+            }
+        );
 
     };
 };
 
 
-
-
-
+function moreTasks() {
+    console.log("\n -------------------------------------------------------------------- \n");
+    Inquirer.prompt(
+        {
+            type: "confirm",
+            name: "confirm",
+            message: "Would you like to do more tasks?"
+        }
+    ).then(function (userInput) {
+        if (userInput["confirm"] === true) {
+            start();
+        } else {
+            quitApp();
+        };
+    });
+};
 
 
 function quitApp() {
