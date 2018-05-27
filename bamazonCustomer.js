@@ -17,13 +17,13 @@ var connection = Mysql.createConnection({
     user: keys.mysqlKey["mysql_DB_user"],
     password: keys.mysqlKey["mysql_DB_password"],
     database: "bamazon_DB"
-})
+});
 
 connection.connect(function (err) {
     if (err) throw err;
     start();
     // connection.end();
-})
+});
 
 function start() {
     console.log("\n -------------------------------------------------------------------- \n");
@@ -33,7 +33,7 @@ function start() {
         var listOfId = [];
         for (var i = 0; i < res.length; i++) {
             listOfId.push(res[i]["item_id"]);
-        }
+        };
 
         //Prompts only if items are available, else app exits.
         if (res.length !== 0) {
@@ -75,10 +75,10 @@ function start() {
         } else {
             console.log("Sorry no items available.");
             quitApp();
-        }
+        };
     });
 
-}
+};
 
 function quantityToPurchase(itemId) {
 
@@ -87,10 +87,7 @@ function quantityToPurchase(itemId) {
         if (err) throw err;
         // console.log(res);
         showSQLTable(res);
-        var itemName = res[0]["product_name"];
-        var itemQty = res[0]["stock_quantity"];
-        var itemCost = res[0]["price"];
-        // console.log(currQty);
+        var item = res[0];
 
         console.log("\n -------------------------------------------------------------------- \n");
         Inquirer.prompt(
@@ -113,8 +110,8 @@ function quantityToPurchase(itemId) {
                         return false;
                     }
 
-                    if (itemQty < parseInt(input)) {
-                        console.log("\n Not enough in stock, please purchase at most " + itemQty + ".");
+                    if (item["stock_quantity"] < parseInt(input)) {
+                        console.log("\n Not enough in stock, please purchase at most " + item["stock_quantity"] + ".");
                         return false;
                     } else {
                         return true;
@@ -124,46 +121,50 @@ function quantityToPurchase(itemId) {
         ).then(function (userInput) {
             if (userInput["quantity"].toUpperCase() !== "Q") {
                 var inputQty = parseInt(userInput["quantity"]);
-                connection.query("UPDATE inventory SET ? WHERE ?",
-                    [
-                        {
-                            stock_quantity: itemQty - inputQty
-                        },
-                        {
-                            item_id: itemId
-                        }
-                    ]
-                )
-
-                var totalCost = itemCost * inputQty
-
-                console.log("You have successfully purchased " + inputQty + " of " + itemName + ".");
-                console.log("Your total cost was $" + totalCost + ".");
-                purchaseMore();
+                purchaseQty(item, inputQty);
             } else {
                 quitApp();
-            }
+            };
         });
     });
+
+    function purchaseQty(item, inputQty) {
+        connection.query("UPDATE inventory SET ? WHERE ?",
+            [
+                {
+                    stock_quantity: item["stock_quantity"] - inputQty
+                },
+                {
+                    item_id: item["item_id"]
+                }
+            ]
+        )
+
+        var totalCost = item["price"] * inputQty;
+
+        console.log("You have successfully purchased " + inputQty + " of " + item["product_name"] + ".");
+        console.log("Your total cost was $" + totalCost + ".");
+        purchaseMore();
+    }
+
+    function purchaseMore() {
+        console.log("\n -------------------------------------------------------------------- \n");
+        Inquirer.prompt(
+            {
+                type: "confirm",
+                name: "confirm",
+                message: "Would you like to buy more items?"
+            }
+        ).then(function (userInput) {
+            if (userInput["confirm"] === true) {
+                start();
+            } else {
+                quitApp();
+            };
+        });
+    };
 };
 
-function purchaseMore() {
-    console.log("\n -------------------------------------------------------------------- \n");
-    Inquirer.prompt(
-        {
-            type: "confirm",
-            name: "confirm",
-            message: "Would you like to buy more items?"
-        }
-    ).then(function (userInput) {
-        if (userInput["confirm"] === true) {
-            start();
-        } else {
-            quitApp();
-        }
-    })
-
-}
 
 
 function quitApp() {
@@ -178,9 +179,9 @@ function checkIdInList(input, listOfId) {
         if (input === listOfId[j]) {
             checkID = true;
         }
-    }
+    };
     return checkID;
-}
+};
 
 //creating a table using npm package cli-table
 function showSQLTable(res) {
@@ -195,10 +196,10 @@ function showSQLTable(res) {
         var rowData = [];
         for (var objKeys in res[i]) {
             rowData.push(res[i][objKeys]);
-        }
+        };
         table.push(rowData);
-    }
+    };
 
     console.log(table.toString());
-}
+};
 
