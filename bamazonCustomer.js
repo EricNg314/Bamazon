@@ -82,7 +82,8 @@ function quantityToPurchase(itemId) {
         // console.log(res);
         showSQLTable(res);
         var itemName = res[0]["product_name"];
-        var currQty = res[0]["stock_quantity"];
+        var itemQty = res[0]["stock_quantity"];
+        var itemCost = res[0]["price"];
         // console.log(currQty);
 
         console.log("\n -------------------------------------------------------------------- \n");
@@ -106,8 +107,8 @@ function quantityToPurchase(itemId) {
                         return false;
                     }
 
-                    if (currQty < parseInt(input)) {
-                        console.log("\n Not enough in stock, please purchase at most " + currQty + ".");
+                    if (itemQty < parseInt(input)) {
+                        console.log("\n Not enough in stock, please purchase at most " + itemQty + ".");
                         return false;
                     } else {
                         return true;
@@ -120,14 +121,18 @@ function quantityToPurchase(itemId) {
                 connection.query("UPDATE inventory SET ? WHERE ?",
                     [
                         {
-                            stock_quantity: currQty - inputQty
+                            stock_quantity: itemQty - inputQty
                         },
                         {
                             item_id: itemId
                         }
                     ]
                 )
+
+                var totalCost = itemCost * inputQty
+
                 console.log("You have successfully purchased " + inputQty + " of " + itemName + ".");
+                console.log("Your total cost was $" + totalCost + ".");
                 purchaseMore();
             } else {
                 quitApp();
