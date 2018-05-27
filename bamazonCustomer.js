@@ -48,9 +48,7 @@ function start() {
                     validate: function (input) {
                         if (input.toUpperCase() === "Q") {
                             return true;
-                        }
-
-                        if (isNaN(input)) {
+                        } else if (isNaN(input)) {
                             console.log("\n " + input + " is not a number, please input an id number.")
                             return !isNaN(input);
                         }
@@ -98,21 +96,19 @@ function quantityToPurchase(itemId) {
                 validate: function (input) {
                     if (input.toUpperCase() === "Q") {
                         return true;
-                    }
 
-                    if (isNaN(input)) {
+                    } else if (isNaN(input)) {
                         console.log("\n " + input + " is not a number, please input a number.")
                         return !isNaN(input);
-                    }
 
-                    if (parseInt(input) < 0) {
+                    } else if (parseInt(input) < 0) {
                         console.log("\n Please input a positive number.");
                         return false;
-                    }
 
-                    if (item["stock_quantity"] < parseInt(input)) {
+                    } else if (item["stock_quantity"] < parseInt(input)) {
                         console.log("\n Not enough in stock, please purchase at most " + item["stock_quantity"] + ".");
                         return false;
+
                     } else {
                         return true;
                     }
