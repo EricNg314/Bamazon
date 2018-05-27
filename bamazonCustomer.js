@@ -17,7 +17,6 @@ var connection = Mysql.createConnection({
     user: keys.mysqlKey["mysql_DB_user"],
     password: keys.mysqlKey["mysql_DB_password"],
     database: "bamazon_DB"
-
 })
 
 connection.connect(function (err) {
@@ -27,6 +26,7 @@ connection.connect(function (err) {
 })
 
 function start() {
+    console.log("\n -------------------------------------------------------------------- \n");
     connection.query("SELECT * FROM inventory", function (err, res) {
         if (err) throw err;
         // console.log(res);
@@ -36,13 +36,17 @@ function start() {
         }
 
         showSQLTable(res);
-
+        console.log("\n -------------------------------------------------------------------- \n");
         Inquirer.prompt(
             {
                 type: "input",
                 name: "id",
-                message: "What is the ID of the item you would like to purhase?",
+                message: "What is the ID of the item you would like to purhase? [Quit with Q]",
                 validate: function (input) {
+                    if (input.toUpperCase() === "Q") {
+                        return true;
+                    }
+
                     if (isNaN(input)) {
                         console.log("\n " + input + " is not a number, please input an id number.")
                         return !isNaN(input);
@@ -58,9 +62,12 @@ function start() {
                 }
             }
         ).then(function (userInput) {
-            console.log(userInput["id"]);
-            var inputID = parseInt(userInput["id"]);
-            quantityToPurchase(inputID);
+            if (userInput["id"].toUpperCase() !== "Q") {
+                var inputID = parseInt(userInput["id"]);
+                quantityToPurchase(inputID);
+            } else {
+                quitApp();
+            }
         });
 
     });
@@ -69,24 +76,31 @@ function start() {
 
 function quantityToPurchase(itemId) {
 
+    console.log("\n -------------------------------------------------------------------- \n");
     connection.query("SELECT * FROM inventory WHERE ?", { item_id: itemId }, function (err, res) {
         if (err) throw err;
         // console.log(res);
         showSQLTable(res);
-
+        var itemName = res[0]["product_name"];
         var currQty = res[0]["stock_quantity"];
         // console.log(currQty);
 
+        console.log("\n -------------------------------------------------------------------- \n");
         Inquirer.prompt(
             {
                 type: "input",
                 name: "quantity",
-                message: "How many would you like to purchase?",
+                message: "How many would you like to purchase? [Quit with Q]",
                 validate: function (input) {
+                    if (input.toUpperCase() === "Q") {
+                        return true;
+                    }
+
                     if (isNaN(input)) {
                         console.log("\n " + input + " is not a number, please input a number.")
                         return !isNaN(input);
                     }
+
                     if (parseInt(input) < 0) {
                         console.log("\n Please input a positive number.");
                         return false;
@@ -101,41 +115,51 @@ function quantityToPurchase(itemId) {
                 }
             },
         ).then(function (userInput) {
-
-            var inputQuantity = parseInt(userInput["quantity"]);
-
-            connection.query("UPDATE inventory SET ? WHERE ?",
-                [
-                    {
-                        stock_quantity: currQty - inputQuantity
-                    },
-                    {
-                        item_id: itemId
-                    }
-                ]
-            )
-
-            connection.query("SELECT * FROM inventory", function (err, res) {
-                if (err) throw err;
-                // console.log(res);
-                showSQLTable(res);
-            });
+            if (userInput["quantity"].toUpperCase() !== "Q") {
+                var inputQty = parseInt(userInput["quantity"]);
+                connection.query("UPDATE inventory SET ? WHERE ?",
+                    [
+                        {
+                            stock_quantity: currQty - inputQty
+                        },
+                        {
+                            item_id: itemId
+                        }
+                    ]
+                )
+                console.log("You have successfully purchased " + inputQty + " of " + itemName + ".");
+                purchaseMore();
+            } else {
+                quitApp();
+            }
         });
     });
 };
 
+function purchaseMore() {
+    console.log("\n -------------------------------------------------------------------- \n");
+    Inquirer.prompt(
+        {
+            type: "confirm",
+            name: "confirm",
+            message: "Would you like to buy more items?"
+        }
+    ).then(function (userInput) {
+        if (userInput["confirm"] === true) {
+            start();
+        } else {
+            quitApp();
+        }
+    })
 
-// function quitApp() {
-//     Inquirer.prompt(
-//         {
-//             type: "confirm",
-//             name: "exit",
-//             message: "Would you like to exit?"
-//         },
-//     ).then(function (userInput) {
-//         console.log(userInput.exit);
-//     });
-// };
+}
+
+
+function quitApp() {
+    console.log("\n ==================================================================== \n");
+    console.log("Thank you for using Bamazon!");
+    connection.end();
+};
 
 function checkIdInList(input, listOfId) {
     var checkID = false;

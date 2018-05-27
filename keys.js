@@ -1,4 +1,4 @@
-console.log("Keys loaded.");
+// console.log("Keys loaded.");
 
 exports.mysqlKey = {
     mysql_DB_host: process.env.MYSQL_HOST,
