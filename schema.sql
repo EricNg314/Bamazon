@@ -17,6 +17,7 @@ INSERT INTO inventory
 VALUES
     ("Chicken", "produce", 8, 10),
     ("Strawberry", "produce", 3, 20),
+    ("Potatoes", "produce", 1, 20),
     ("GameCube", "electronics", 200, 8),
     ("Play Station 4", "electronics", 300, 8),
     ("Xbox 360", "electronics", 150, 8);
