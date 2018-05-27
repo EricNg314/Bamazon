@@ -35,41 +35,47 @@ function start() {
             listOfId.push(res[i]["item_id"]);
         }
 
-        showSQLTable(res);
-        console.log("\n -------------------------------------------------------------------- \n");
-        Inquirer.prompt(
-            {
-                type: "input",
-                name: "id",
-                message: "What is the ID of the item you would like to purhase? [Quit with Q]",
-                validate: function (input) {
-                    if (input.toUpperCase() === "Q") {
-                        return true;
-                    }
+        //Prompts only if items are available, else app exits.
+        if (res.length !== 0) {
+            showSQLTable(res);
 
-                    if (isNaN(input)) {
-                        console.log("\n " + input + " is not a number, please input an id number.")
-                        return !isNaN(input);
-                    }
+            console.log("\n -------------------------------------------------------------------- \n");
+            Inquirer.prompt(
+                {
+                    type: "input",
+                    name: "id",
+                    message: "What is the ID of the item you would like to purhase? [Quit with Q]",
+                    validate: function (input) {
+                        if (input.toUpperCase() === "Q") {
+                            return true;
+                        }
 
-                    var check = checkIdInList(parseInt(input), listOfId);
-                    if (check === false) {
-                        console.log("\n " + input + " is not in the current list of id numbers.")
-                        return false;
-                    } else {
-                        return true;
+                        if (isNaN(input)) {
+                            console.log("\n " + input + " is not a number, please input an id number.")
+                            return !isNaN(input);
+                        }
+
+                        var check = checkIdInList(parseInt(input), listOfId);
+                        if (check === false) {
+                            console.log("\n " + input + " is not in the current list of id numbers.")
+                            return false;
+                        } else {
+                            return true;
+                        }
                     }
                 }
-            }
-        ).then(function (userInput) {
-            if (userInput["id"].toUpperCase() !== "Q") {
-                var inputID = parseInt(userInput["id"]);
-                quantityToPurchase(inputID);
-            } else {
-                quitApp();
-            }
-        });
-
+            ).then(function (userInput) {
+                if (userInput["id"].toUpperCase() !== "Q") {
+                    var inputID = parseInt(userInput["id"]);
+                    quantityToPurchase(inputID);
+                } else {
+                    quitApp();
+                }
+            });
+        } else {
+            console.log("Sorry no items available.");
+            quitApp();
+        }
     });
 
 }

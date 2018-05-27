@@ -39,6 +39,7 @@ function start() {
                 break;
             case "View Low Inventory":
                 // console.log("Items in inventory");
+                viewLowProducts();
                 break;
             case "Add to Inventory":
                 // console.log("Adding inventory");
@@ -56,8 +57,28 @@ function start() {
 
 function viewProducts() {
     connection.query("SELECT * FROM inventory", function (err, res) {
-        showSQLTable(res);
-        start();
+        console.log(res);
+        if (res.length !== 0) {
+            showSQLTable(res);
+            start();
+        } else {
+            console.log("Sorry no items available.");
+            start();
+        }
+    })
+}
+
+
+function viewLowProducts() {
+    connection.query("SELECT * FROM inventory WHERE stock_quantity <= 3", function (err, res) {
+        console.log(res);
+        if (res.length !== 0) {
+            showSQLTable(res);
+            start();
+        } else {
+            console.log("Sorry no items available.");
+            start();
+        }
     })
 }
 

@@ -20,4 +20,5 @@ VALUES
     ("Potatoes", "produce", 1, 20),
     ("GameCube", "electronics", 200, 8),
     ("Play Station 4", "electronics", 300, 8),
-    ("Xbox 360", "electronics", 150, 8);
+    ("Xbox 360", "electronics", 150, 8),
+    ("Dell Computer", "electronics", 150, 1);
