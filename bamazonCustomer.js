@@ -53,7 +53,7 @@ function start() {
                             return !isNaN(input);
                         }
 
-                        var check = checkIdInList(parseInt(input), listOfId);
+                        var check = checkIdInList(parseFloat(input), listOfId);
                         if (check === false) {
                             console.log("\n " + input + " is not in the current list of id numbers.")
                             return false;
