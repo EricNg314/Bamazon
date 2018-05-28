@@ -66,10 +66,10 @@ function viewProducts() {
         // console.log(res);
         if (res.length !== 0) {
             showSQLTable(res);
-            start();
+            moreTasks();
         } else {
             console.log("Sorry no items available.");
-            start();
+            moreTasks();
         };
     });
 };
@@ -80,10 +80,10 @@ function viewLowProducts(lowQty) {
         // console.log(res);
         if (res.length !== 0) {
             showSQLTable(res);
-            start();
+            moreTasks();
         } else {
             console.log("Sorry no items below " + lowQty + " quantity available.");
-            start();
+            moreTasks();
         };
     });
 };
@@ -146,21 +146,8 @@ function addInventory() {
                 name: "quantity",
                 message: "How much would you like to add? [Quit with Q]",
                 validate: function (input) {
-                    if (input.toUpperCase() === "Q") {
-                        return true;
-                    } else if (input < 0) {
-                        console.log("\n Error: Unable to process due to negative quantity.");
-                        return false;
-                    } else if (isNaN(input)) {
-                        console.log("\n Error: " + input + " is not a number, please enter a number.");
-                        return false;
-                    } else if (!(Number.isInteger(parseFloat(input)))) {
-                        console.log("\n Error: " + input + " is NOT an integer");
-                        return false;
-                    } else {
-                        return true;
-                    }
-
+                    var check = checkIfNumbAbove0(input);
+                    return check;
                 }
             }
         ).then(function (userInput) {
@@ -245,22 +232,109 @@ function addNewProduct() {
                 if (userInput["department"].toUpperCase() !== "Q") {
                     product["department_name"] = userInput["department"];
                     // console.log(product);
-    
+
                     requestCost(product);
-    
+
                 } else {
                     quitApp();
                 };
             });
         });
     };
+
+    function requestCost(product) {
+        console.log("\n -------------------------------------------------------------------- \n");
+        Inquirer.prompt(
+            {
+                type: "input",
+                name: "cost",
+                message: "What is the price of this item? [Quit with Q]",
+                validate: function (input) {
+                    var check = checkIfNumbAbove0(input);
+                    return check;
+                }
+            }
+        ).then(function (userInput) {
+            if (userInput["cost"].toUpperCase() !== "Q") {
+                product["price"] = parseFloat(userInput["cost"]);
+                // console.log(product);
+
+                requestQty(product);
+
+            } else {
+                quitApp();
+            };
+        });
+    };
+
+    function requestQty(product) {
+        console.log("\n -------------------------------------------------------------------- \n");
+        Inquirer.prompt(
+            {
+                type: "input",
+                name: "quantity",
+                message: "What is the quantity you wish to add? [Quit with Q]",
+                validate: function (input) {
+                    var check = checkIfNumbAbove0(input);
+                    if (!(Number.isInteger(parseFloat(input)))) {
+                        console.log("\n Error: " + input + " is NOT an integer");
+                        return false;
+                    }
+                    return check;
+                }
+            }
+        ).then(function (userInput) {
+            if (userInput["quantity"].toUpperCase() !== "Q") {
+                product["stock_quantity"] = parseInt(userInput["quantity"]);
+
+                addToDB(product);
+
+            } else {
+                quitApp();
+            };
+        });
+    };
+
+    function addToDB(product) {
+        console.log("\n -------------------------------------------------------------------- \n");
+        connection.query("INSERT INTO inventory SET ?",
+            {
+                product_name: product["product_name"],
+                department_name: product["department_name"],
+                price: product["price"],
+                stock_quantity: product["stock_quantity"]
+                // }, function(err){
+            }, function (err, res) {
+                if (err) throw err;
+
+                connection.query("SELECT * FROM inventory WHERE ?", { item_id: res.insertId }, function (err, resQuery) {
+                    if (err) throw err;
+                    showSQLTable(resQuery);
+
+                    console.log("\n " + product["product_name"] + " has been added to Bamazon!");
+
+                    moreTasks();
+                })
+            }
+        );
+    };
+
 };
 
-function requestCost(product){
-    console.log("\n -------------------------------------------------------------------- \n");
-    
-}
 
+function checkIfNumbAbove0(input) {
+    if (input.toUpperCase() === "Q") {
+        return true;
+    } else if (input < 0) {
+        console.log("\n Error: Unable to process due to negative value.");
+        return false;
+    } else if (isNaN(input)) {
+        console.log("\n Error: " + input + " is not a number, please enter a number.");
+        return false;
+    } else {
+        return true;
+    }
+}
 
 function moreTasks() {
     console.log("\n -------------------------------------------------------------------- \n");
