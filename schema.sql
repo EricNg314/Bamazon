@@ -41,4 +41,5 @@ INSERT INTO departments
 VALUES
     ("produce", 500),
     ("clothing", 450),
+    ("drinks", 450),
     ("electronics", 1000);
