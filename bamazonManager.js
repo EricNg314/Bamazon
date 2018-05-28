@@ -64,6 +64,7 @@ function start() {
 
 function viewProducts() {
     connection.query("SELECT * FROM inventory", function (err, res) {
+        if(err) throw err;
         // console.log(res);
         if (res.length !== 0) {
             showSQLTable(res);
