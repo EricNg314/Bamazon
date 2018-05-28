@@ -29,7 +29,7 @@ function start() {
             type: "list",
             name: "task",
             message: "What would you like to do?",
-            choices: ["View Products for Sale", "View Low Inventory (Less Than " + lowQty + ")", "Add to Inventory", "Add New Products", "Delete Products", "Exit Bamazon Manager"]
+            choices: ["View Products for Sale", "View Low Inventory (Less Than " + lowQty + ")", "Add to Inventory", "Add New Products", "Delete a Product", "Exit Bamazon Manager"]
         }
     ).then(function (userInput) {
         // console.log(userInput.task);
@@ -50,8 +50,9 @@ function start() {
                 // console.log("Adding a new product");
                 addNewProduct();
                 break;
-            case "Delete Products":
-                console.log("Deleting a product");
+            case "Delete a Product":
+                // console.log("Deleting a product");
+                deleteProduct();
                 break;
             case "Exit Bamazon Manager":
                 quitApp();
@@ -321,6 +322,89 @@ function addNewProduct() {
 
 };
 
+function deleteProduct() {
+
+    console.log("\n -------------------------------------------------------------------- \n");
+    connection.query("SELECT * FROM inventory", function (err, res) {
+        if (err) throw err;
+        // console.log(res);
+        var listOfId = [];
+        for (var i = 0; i < res.length; i++) {
+            listOfId.push(res[i]["item_id"]);
+        };
+
+        if (res.length !== 0) {
+            showSQLTable(res);
+
+            console.log("\n -------------------------------------------------------------------- \n");
+            Inquirer.prompt(
+                {
+                    type: "input",
+                    name: "id",
+                    message: "What is the ID of the item you would like to delete? [Quit with Q]",
+                    validate: function (input) {
+                        if (input.toUpperCase() === "Q") {
+                            return true;
+                        } else if (isNaN(input)) {
+                            console.log("\n " + input + " is not a number, please input an id number.")
+                            return false;
+                        }
+
+                        var check = checkIdInList(parseFloat(input), listOfId);
+                        if (check === false) {
+                            console.log("\n " + input + " is not in the current list of id numbers.")
+                            return false;
+                        } else {
+                            return true;
+                        }
+                    }
+                }
+            ).then(function (userInput) {
+                if (userInput["id"].toUpperCase() !== "Q") {
+                    var inputID = parseInt(userInput["id"]);
+                    // console.log("entered")
+                    deleteID(inputID);
+                } else {
+                    quitApp();
+                }
+            });
+        } else {
+            console.log("Sorry no items available.");
+            quitApp();
+        };
+    });
+
+    function deleteID(inputID) {
+
+        connection.query("SELECT * FROM inventory WHERE ?", { item_id: inputID }, function (err, res) {
+            if (err) throw err;
+
+
+            connection.query("DELETE FROM inventory WHERE ?", { item_id: inputID }, function (err, resDelete) {
+                if (err) throw err;
+
+                console.log("\n -------------------------------------------------------------------- \n");
+                console.log("You have successfully deleted the following: ");
+                showSQLTable(res);
+
+                moreTasks();
+            });
+
+        });
+    }
+
+
+};
+
+function checkIdInList(input, listOfId) {
+    var checkID = false;
+    for (var j = 0; j < listOfId.length; j++) {
+        if (input === listOfId[j]) {
+            checkID = true;
+        }
+    };
+    return checkID;
+};
 
 function checkIfNumbAbove0(input) {
     if (input.toUpperCase() === "Q") {
