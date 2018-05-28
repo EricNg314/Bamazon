@@ -128,6 +128,7 @@ function quantityToPurchase(itemId) {
         connection.query("UPDATE inventory SET ? WHERE ?",
             [
                 {
+                    product_sales: item["product_sales"] + (inputQty * item["price"]),
                     stock_quantity: item["stock_quantity"] - inputQty
                 },
                 {
@@ -184,14 +185,24 @@ function showSQLTable(res) {
     //turns the first object's keys into an array called keys.
     var keys = Object.keys(res[0]);
 
+    //Removing key so customer does not see sales.
+    var keysCleaned = [];
+    for (let i = 0; i < keys.length; i++) {
+        if (keys[i] !== "product_sales") {
+            keysCleaned.push(keys[i]);
+        };
+    }
+
     var table = new Table({
-        head: keys
+        head: keysCleaned
     });
 
     for (let i = 0; i < res.length; i++) {
         var rowData = [];
         for (var objKeys in res[i]) {
-            rowData.push(res[i][objKeys]);
+            if (objKeys !== "product_sales") {
+                rowData.push(res[i][objKeys]);
+            };
         };
         table.push(rowData);
     };
