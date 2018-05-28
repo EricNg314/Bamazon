@@ -2,7 +2,7 @@ require("dotenv").config();
 
 var Mysql = require("mysql");
 var Inquirer = require("inquirer");
-var Table = require("cli-table");
+var Table = require("cli-table2");
 
 var keys = require("./keys.js");
 
@@ -35,11 +35,11 @@ function start() {
         switch (userInput.task) {
             case "View Product Sales by Department":
                 // console.log("For Sale");
-                // viewProducts();
+                viewSalesByDept();
                 break;
             case "Create New Department":
                 // console.log("Items in inventory");
-                // addNewDepartment();
+                addNewDepartment();
                 break;
             case "Delete a Department":
                 // console.log("Deleting a product");
@@ -52,6 +52,155 @@ function start() {
 
     });
 }
+
+function viewSalesByDept() {
+    connection.query("SELECT * FROM departments LEFT JOIN inventory ON departments.department_name=inventory.department_name", function (err, res) {
+        if (err) throw err;
+        // console.log(res);
+
+        if (res.length !== 0) {
+            // console.log("test");
+            showSQLTable(res);
+            moreTasks();
+        } else {
+            console.log("Sorry no items available.");
+            moreTasks();
+        };
+    });
+};
+
+
+
+function addNewDepartment() {
+    console.log("\n -------------------------------------------------------------------- \n");
+    Inquirer.prompt(
+        {
+            type: "input",
+            name: "name",
+            message: "What new department would you like to add? [Quit with Q]"
+        }
+    ).then(function (userInput) {
+        if (userInput["name"].toUpperCase() !== "Q") {
+            var product = {};
+            product["product_name"] = userInput["name"];
+            // requestDept(product);
+            console.log("TO BE UPDATED.");
+        } else {
+            quitApp();
+        }
+
+    });
+
+    function requestDept(product) {
+        console.log("\n -------------------------------------------------------------------- \n");
+
+        var deptList = [];
+        connection.query("SELECT DISTINCT department_name FROM inventory", function (err, res) {
+            for (let i = 0; i < res.length; i++) {
+                deptList.push(res[i]["department_name"]);
+            }
+            // console.log(deptList)
+
+            Inquirer.prompt(
+                {
+                    type: "rawlist",
+                    name: "department",
+                    message: "What department should this go under? [Quit with Q]",
+                    choices: deptList
+                }
+            ).then(function (userInput) {
+                if (userInput["department"].toUpperCase() !== "Q") {
+                    product["department_name"] = userInput["department"];
+                    // console.log(product);
+
+                    requestCost(product);
+
+                } else {
+                    quitApp();
+                };
+            });
+        });
+    };
+
+    function requestCost(product) {
+        console.log("\n -------------------------------------------------------------------- \n");
+        Inquirer.prompt(
+            {
+                type: "input",
+                name: "cost",
+                message: "What is the price of this item? [Quit with Q]",
+                validate: function (input) {
+                    var check = checkIfNumbAbove0(input);
+                    return check;
+                }
+            }
+        ).then(function (userInput) {
+            if (userInput["cost"].toUpperCase() !== "Q") {
+                product["price"] = parseFloat(userInput["cost"]);
+                // console.log(product);
+
+                requestQty(product);
+
+            } else {
+                quitApp();
+            };
+        });
+    };
+
+    function requestQty(product) {
+        console.log("\n -------------------------------------------------------------------- \n");
+        Inquirer.prompt(
+            {
+                type: "input",
+                name: "quantity",
+                message: "What is the quantity you wish to add? [Quit with Q]",
+                validate: function (input) {
+                    var check = checkIfNumbAbove0(input);
+                    if (!(Number.isInteger(parseFloat(input)))) {
+                        console.log("\n Error: " + input + " is NOT an integer");
+                        return false;
+                    }
+                    return check;
+                }
+            }
+        ).then(function (userInput) {
+            if (userInput["quantity"].toUpperCase() !== "Q") {
+                product["stock_quantity"] = parseInt(userInput["quantity"]);
+
+                addToDB(product);
+
+            } else {
+                quitApp();
+            };
+        });
+    };
+
+    function addToDB(product) {
+        console.log("\n -------------------------------------------------------------------- \n");
+        connection.query("INSERT INTO inventory SET ?",
+            {
+                product_name: product["product_name"],
+                department_name: product["department_name"],
+                price: product["price"],
+                stock_quantity: product["stock_quantity"]
+                // }, function(err){
+            }, function (err, res) {
+                if (err) throw err;
+
+                connection.query("SELECT * FROM inventory WHERE ?", { item_id: res.insertId }, function (err, resQuery) {
+                    if (err) throw err;
+                    showSQLTable(resQuery);
+
+                    console.log("\n " + product["product_name"] + " has been added to Bamazon!");
+
+                    moreTasks();
+                })
+            }
+        );
+    };
+
+};
+
 
 
 function deleteDepartment() {
@@ -165,6 +314,7 @@ function quitApp() {
 
 function showSQLTable(res) {
     var keys = Object.keys(res[0]);
+
     var table = new Table({
         head: keys
     });
@@ -173,8 +323,11 @@ function showSQLTable(res) {
         var rowData = [];
         for (var objKeys in res[i]) {
             rowData.push(res[i][objKeys]);
+
         }
+        console.log(rowData);
         table.push(rowData);
     };
     console.log(table.toString());
 };
+
