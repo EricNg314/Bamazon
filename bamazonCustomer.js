@@ -2,7 +2,7 @@ require("dotenv").config();
 
 var Mysql = require("mysql");
 var Inquirer = require("inquirer");
-var Table = require("cli-table");
+var Table = require("cli-table2");
 
 var keys = require("./keys.js")
 
@@ -29,7 +29,7 @@ function start() {
     console.log("\n -------------------------------------------------------------------- \n");
     connection.query("SELECT * FROM inventory", function (err, res) {
         if (err) throw err;
-        // console.log(res);
+        console.log(res);
         var listOfId = [];
         for (var i = 0; i < res.length; i++) {
             listOfId.push(res[i]["item_id"]);

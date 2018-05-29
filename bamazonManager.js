@@ -2,7 +2,7 @@ require("dotenv").config();
 
 var Mysql = require("mysql");
 var Inquirer = require("inquirer");
-var Table = require("cli-table");
+var Table = require("cli-table2");
 
 var keys = require("./keys.js");
 
