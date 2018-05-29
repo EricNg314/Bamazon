@@ -217,7 +217,7 @@ function addNewProduct() {
         console.log("\n -------------------------------------------------------------------- \n");
 
         var deptList = [];
-        connection.query("SELECT DISTINCT department_name FROM inventory", function (err, res) {
+        connection.query("SELECT DISTINCT department_name FROM departments", function (err, res) {
             for (let i = 0; i < res.length; i++) {
                 deptList.push(res[i]["department_name"]);
             }
@@ -303,6 +303,7 @@ function addNewProduct() {
             {
                 product_name: product["product_name"],
                 department_name: product["department_name"],
+                product_sales: 0,
                 price: product["price"],
                 stock_quantity: product["stock_quantity"]
                 // }, function(err){

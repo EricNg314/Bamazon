@@ -55,18 +55,16 @@ function start() {
 
 function viewSalesByDept() {
 
-    // var columns = ["departments.department_id", "departments.department_name"];
+    // var columns = ["departments.department_id AS Dept.ID", "departments.department_name"];
     // var table = "departments";
     // var joinTable = "inventory"
     // var onColumn = ["inventory.department_name", "departments.department_name"]
 
     connection.query("SELECT departments.department_id AS 'Dept. ID', departments.department_name AS 'Dept. Name', departments.over_head_costs AS 'Dept. Cost', COALESCE(sum(inventory.product_sales), 0) AS 'Product Sales', (COALESCE(sum(inventory.product_sales), 0) - departments.over_head_costs) AS 'Totals' FROM departments LEFT JOIN inventory ON departments.department_name=inventory.department_name GROUP BY departments.department_id ORDER BY departments.department_name", function (err, res) {
-        // connection.query("SELECT ?? FROM ?? LEFT JOIN ?? ON ??",
+        // connection.query("SELECT ?? FROM ??",
         //     [
         //         columns,
-        //         table,
-        //         joinTable,
-        //         onColumn
+        //         table
 
         //     ], function (err, res) {
         if (err) throw err;

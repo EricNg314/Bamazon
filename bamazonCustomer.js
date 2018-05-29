@@ -29,7 +29,7 @@ function start() {
     console.log("\n -------------------------------------------------------------------- \n");
     connection.query("SELECT * FROM inventory", function (err, res) {
         if (err) throw err;
-        console.log(res);
+        // console.log(res);
         var listOfId = [];
         for (var i = 0; i < res.length; i++) {
             listOfId.push(res[i]["item_id"]);
