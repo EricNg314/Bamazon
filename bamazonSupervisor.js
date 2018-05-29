@@ -93,65 +93,34 @@ function addNewDepartment() {
         }
     ).then(function (userInput) {
         if (userInput["name"].toUpperCase() !== "Q") {
-            var product = {};
-            product["product_name"] = userInput["name"];
-            // requestDept(product);
-            console.log("TO BE UPDATED.");
+            var deptInfo = {};
+            deptInfo["department_name"] = userInput["name"];
+            requestDeptCosts(deptInfo);
+            // console.log("TO BE UPDATED.");
         } else {
             quitApp();
         }
 
     });
 
-    function requestDept(product) {
-        console.log("\n -------------------------------------------------------------------- \n");
-
-        var deptList = [];
-        connection.query("SELECT DISTINCT department_name FROM inventory", function (err, res) {
-            for (let i = 0; i < res.length; i++) {
-                deptList.push(res[i]["department_name"]);
-            }
-            // console.log(deptList)
-
-            Inquirer.prompt(
-                {
-                    type: "rawlist",
-                    name: "department",
-                    message: "What department should this go under? [Quit with Q]",
-                    choices: deptList
-                }
-            ).then(function (userInput) {
-                if (userInput["department"].toUpperCase() !== "Q") {
-                    product["department_name"] = userInput["department"];
-                    // console.log(product);
-
-                    requestCost(product);
-
-                } else {
-                    quitApp();
-                };
-            });
-        });
-    };
-
-    function requestCost(product) {
+    function requestDeptCosts(deptInfo){
         console.log("\n -------------------------------------------------------------------- \n");
         Inquirer.prompt(
             {
                 type: "input",
                 name: "cost",
-                message: "What is the price of this item? [Quit with Q]",
+                message: "What is the over head costs of this department? [Quit with Q]",
                 validate: function (input) {
-                    var check = checkIfNumbAbove0(input);
+                    var check = checkIfNumbNegative(input);
                     return check;
                 }
             }
         ).then(function (userInput) {
             if (userInput["cost"].toUpperCase() !== "Q") {
-                product["price"] = parseFloat(userInput["cost"]);
+                deptInfo["over_head_costs"] = parseFloat(userInput["cost"]);
                 // console.log(product);
 
-                requestQty(product);
+                addToDB(deptInfo);
 
             } else {
                 quitApp();
@@ -159,51 +128,21 @@ function addNewDepartment() {
         });
     };
 
-    function requestQty(product) {
+    function addToDB(deptInfo) {
         console.log("\n -------------------------------------------------------------------- \n");
-        Inquirer.prompt(
+        connection.query("INSERT INTO departments SET ?",
             {
-                type: "input",
-                name: "quantity",
-                message: "What is the quantity you wish to add? [Quit with Q]",
-                validate: function (input) {
-                    var check = checkIfNumbAbove0(input);
-                    if (!(Number.isInteger(parseFloat(input)))) {
-                        console.log("\n Error: " + input + " is NOT an integer");
-                        return false;
-                    }
-                    return check;
-                }
-            }
-        ).then(function (userInput) {
-            if (userInput["quantity"].toUpperCase() !== "Q") {
-                product["stock_quantity"] = parseInt(userInput["quantity"]);
+                department_name: deptInfo["department_name"],
+                over_head_costs: deptInfo["over_head_costs"]
 
-                addToDB(product);
-
-            } else {
-                quitApp();
-            };
-        });
-    };
-
-    function addToDB(product) {
-        console.log("\n -------------------------------------------------------------------- \n");
-        connection.query("INSERT INTO inventory SET ?",
-            {
-                product_name: product["product_name"],
-                department_name: product["department_name"],
-                price: product["price"],
-                stock_quantity: product["stock_quantity"]
-                // }, function(err){
             }, function (err, res) {
                 if (err) throw err;
 
-                connection.query("SELECT * FROM inventory WHERE ?", { item_id: res.insertId }, function (err, resQuery) {
+                connection.query("SELECT * FROM departments WHERE ?", { department_id: res.insertId }, function (err, resQuery) {
                     if (err) throw err;
                     showSQLTable(resQuery);
 
-                    console.log("\n " + product["product_name"] + " has been added to Bamazon!");
+                    console.log("\n " + deptInfo["department_name"] + " has been added to departments in Bamazon");
 
                     moreTasks();
                 })
@@ -298,6 +237,20 @@ function checkIdInList(input, listOfId) {
     return checkID;
 };
 
+function checkIfNumbNegative(input) {
+    if (input.toUpperCase() === "Q") {
+        return true;
+    } else if (input < 0) {
+        console.log("\n Error: Unable to process due to negative value.");
+        return false;
+    } else if (isNaN(input)) {
+        console.log("\n Error: " + input + " is not a number, please enter a number.");
+        return false;
+    } else {
+        return true;
+    }
+}
+
 function moreTasks() {
     console.log("\n -------------------------------------------------------------------- \n");
     Inquirer.prompt(
@@ -337,7 +290,6 @@ function showSQLTable(res) {
             rowData.push(res[i][objKeys]);
 
         }
-        console.log(rowData);
         table.push(rowData);
     };
     console.log(table.toString());

@@ -94,23 +94,14 @@ function quantityToPurchase(itemId) {
                 name: "quantity",
                 message: "How many would you like to purchase? [Quit with Q]",
                 validate: function (input) {
-                    if (input.toUpperCase() === "Q") {
-                        return true;
+                    var check = checkIfNumbNegative(input);
 
-                    } else if (isNaN(input)) {
-                        console.log("\n " + input + " is not a number, please input a number.")
-                        return !isNaN(input);
-
-                    } else if (parseInt(input) < 0) {
-                        console.log("\n Please input a positive number.");
-                        return false;
-
-                    } else if (item["stock_quantity"] < parseInt(input)) {
-                        console.log("\n Not enough in stock, please purchase at most " + item["stock_quantity"] + ".");
+                    if (item["stock_quantity"] < parseInt(input)) {
+                        console.log("\n Error: Not enough in stock, please purchase at most " + item["stock_quantity"] + ".");
                         return false;
 
                     } else {
-                        return true;
+                        return check;
                     }
                 }
             },
@@ -125,6 +116,8 @@ function quantityToPurchase(itemId) {
     });
 
     function purchaseQty(item, inputQty) {
+
+        console.log("\n -------------------------------------------------------------------- \n");
         connection.query("UPDATE inventory SET ? WHERE ?",
             [
                 {
@@ -179,6 +172,20 @@ function checkIdInList(input, listOfId) {
     };
     return checkID;
 };
+
+function checkIfNumbNegative(input) {
+    if (input.toUpperCase() === "Q") {
+        return true;
+    } else if (input < 0) {
+        console.log("\n Error: Unable to process due to negative value.");
+        return false;
+    } else if (isNaN(input)) {
+        console.log("\n Error: " + input + " is not a number, please enter a number.");
+        return false;
+    } else {
+        return true;
+    }
+}
 
 //creating a table using npm package cli-table
 function showSQLTable(res) {

@@ -148,7 +148,7 @@ function addInventory() {
                 name: "quantity",
                 message: "How much would you like to add? [Quit with Q]",
                 validate: function (input) {
-                    var check = checkIfNumbAbove0(input);
+                    var check = checkIfNumbNegative(input);
                     return check;
                 }
             }
@@ -252,7 +252,7 @@ function addNewProduct() {
                 name: "cost",
                 message: "What is the price of this item? [Quit with Q]",
                 validate: function (input) {
-                    var check = checkIfNumbAbove0(input);
+                    var check = checkIfNumbNegative(input);
                     return check;
                 }
             }
@@ -277,7 +277,7 @@ function addNewProduct() {
                 name: "quantity",
                 message: "What is the quantity you wish to add? [Quit with Q]",
                 validate: function (input) {
-                    var check = checkIfNumbAbove0(input);
+                    var check = checkIfNumbNegative(input);
                     if (!(Number.isInteger(parseFloat(input)))) {
                         console.log("\n Error: " + input + " is NOT an integer");
                         return false;
@@ -408,7 +408,7 @@ function checkIdInList(input, listOfId) {
     return checkID;
 };
 
-function checkIfNumbAbove0(input) {
+function checkIfNumbNegative(input) {
     if (input.toUpperCase() === "Q") {
         return true;
     } else if (input < 0) {
