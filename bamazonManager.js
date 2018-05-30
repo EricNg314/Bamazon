@@ -64,14 +64,14 @@ function start() {
 
 function viewProducts() {
     connection.query("SELECT * FROM inventory", function (err, res) {
-        if(err) throw err;
+        if (err) throw err;
         // console.log(res);
         if (res.length !== 0) {
             showSQLTable(res);
-            moreTasks();
+            start();
         } else {
             console.log("Sorry no items available.");
-            moreTasks();
+            start();
         };
     });
 };
@@ -82,10 +82,10 @@ function viewLowProducts(lowQty) {
         // console.log(res);
         if (res.length !== 0) {
             showSQLTable(res);
-            moreTasks();
+            start();
         } else {
             console.log("Sorry no items below " + lowQty + " quantity available.");
-            moreTasks();
+            start();
         };
     });
 };
@@ -149,6 +149,13 @@ function addInventory() {
                 message: "How much would you like to add? [Quit with Q]",
                 validate: function (input) {
                     var check = checkIfNumbNegative(input);
+                    if(input.toUpperCase() === "Q"){
+                        return true;
+                    }
+                    if (!(Number.isInteger(parseFloat(input)))) {
+                        console.log("\n Error: " + input + " is NOT an integer");
+                        return false;
+                    }
                     return check;
                 }
             }
@@ -186,7 +193,7 @@ function addInventory() {
                 showSQLTable(res);
                 console.log(selectedItem["product_name"] + " has been successfully updated to " + res[0]["stock_quantity"]);
 
-                moreTasks();
+                start();
             }
         );
 
@@ -253,6 +260,14 @@ function addNewProduct() {
                 message: "What is the price of this item? [Quit with Q]",
                 validate: function (input) {
                     var check = checkIfNumbNegative(input);
+
+                    //Checking if there's more than 2 decimal points.
+                    var inputLength = ((parseFloat(input)).toString().length);
+                    var inputIntLength = ((parseInt(input)).toString().length)
+                    if ((inputLength - inputIntLength) > 2) {
+                        check = false;
+                        console.log("\n Error: Too many decmial points, max of 2.");
+                    };
                     return check;
                 }
             }
@@ -278,6 +293,9 @@ function addNewProduct() {
                 message: "What is the quantity you wish to add? [Quit with Q]",
                 validate: function (input) {
                     var check = checkIfNumbNegative(input);
+                    if(input.toUpperCase() === "Q"){
+                        return true;
+                    }
                     if (!(Number.isInteger(parseFloat(input)))) {
                         console.log("\n Error: " + input + " is NOT an integer");
                         return false;
@@ -316,7 +334,7 @@ function addNewProduct() {
 
                     console.log("\n " + product["product_name"] + " has been added to Bamazon!");
 
-                    moreTasks();
+                    start();
                 })
             }
         );
@@ -389,7 +407,7 @@ function deleteProduct() {
                 console.log("You have successfully deleted the following: ");
                 showSQLTable(res);
 
-                moreTasks();
+                start();
             });
 
         });

@@ -7,9 +7,9 @@ CREATE TABLE inventory(
     item_id INT NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (item_id),
     product_name VARCHAR (200),
-    product_sales FLOAT,
+    product_sales FLOAT(2),
     department_name VARCHAR (50),
-    price FLOAT,
+    price FLOAT(2),
     stock_quantity INT
 );
 
@@ -34,7 +34,7 @@ CREATE TABLE departments(
     department_id INT NOT NULL AUTO_INCREMENT,
     PRIMARY KEY (department_id),
     department_name VARCHAR (200),
-    over_head_costs FLOAT
+    over_head_costs FLOAT(2)
 );
 
 INSERT INTO departments

@@ -73,10 +73,10 @@ function viewSalesByDept() {
         if (res.length !== 0) {
             // console.log("test");
             showSQLTable(res);
-            moreTasks();
+            start();
         } else {
             console.log("Sorry no items available.");
-            moreTasks();
+            start();
         };
     });
 };
@@ -103,7 +103,7 @@ function addNewDepartment() {
 
     });
 
-    function requestDeptCosts(deptInfo){
+    function requestDeptCosts(deptInfo) {
         console.log("\n -------------------------------------------------------------------- \n");
         Inquirer.prompt(
             {
@@ -112,6 +112,14 @@ function addNewDepartment() {
                 message: "What is the over head costs of this department? [Quit with Q]",
                 validate: function (input) {
                     var check = checkIfNumbNegative(input);
+
+                    //Checking if there's more than 2 decimal points.
+                    var inputLength = ((parseFloat(input)).toString().length);
+                    var inputIntLength = ((parseInt(input)).toString().length)
+                    if ((inputLength - inputIntLength) > 2) {
+                        check = false;
+                        console.log("\n Error: Too many decmial points, max of 2.");
+                    };
                     return check;
                 }
             }
@@ -144,7 +152,7 @@ function addNewDepartment() {
 
                     console.log("\n " + deptInfo["department_name"] + " has been added to departments in Bamazon");
 
-                    moreTasks();
+                    start();
                 })
             }
         );
@@ -219,7 +227,7 @@ function deleteDepartment() {
                 console.log("You have successfully deleted the following: ");
                 showSQLTable(res);
 
-                moreTasks();
+                start();
             });
 
         });

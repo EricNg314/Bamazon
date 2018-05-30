@@ -95,14 +95,20 @@ function quantityToPurchase(itemId) {
                 message: "How many would you like to purchase? [Quit with Q]",
                 validate: function (input) {
                     var check = checkIfNumbNegative(input);
-
+                    if(input.toUpperCase() === "Q"){
+                        return true;
+                    }
                     if (item["stock_quantity"] < parseInt(input)) {
                         console.log("\n Error: Not enough in stock, please purchase at most " + item["stock_quantity"] + ".");
                         return false;
 
-                    } else {
-                        return check;
                     }
+                    if (!(Number.isInteger(parseFloat(input)))) {
+                        console.log("\n Error: " + input + " is NOT an integer");
+                        return false;
+                    }
+                    return check;
+
                 }
             },
         ).then(function (userInput) {
