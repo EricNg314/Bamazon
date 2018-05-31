@@ -32,28 +32,28 @@ function start() {
             choices: ["View Products for Sale", "View Low Inventory (Less Than " + lowQty + ")", "Add to Inventory", "Add New Products", "Delete a Product", "Exit Bamazon Manager"]
         }
     ).then(function (userInput) {
-        // console.log(userInput.task);
+
         switch (userInput.task) {
             case "View Products for Sale":
-                // console.log("For Sale");
                 viewProducts();
                 break;
+
             case "View Low Inventory (Less Than " + lowQty + ")":
-                // console.log("Items in inventory");
                 viewLowProducts(lowQty);
                 break;
+
             case "Add to Inventory":
-                // console.log("Adding inventory");
                 addInventory();
                 break;
+
             case "Add New Products":
-                // console.log("Adding a new product");
                 addNewProduct();
                 break;
+
             case "Delete a Product":
-                // console.log("Deleting a product");
                 deleteProduct();
                 break;
+
             case "Exit Bamazon Manager":
                 quitApp();
                 break;
@@ -65,7 +65,7 @@ function start() {
 function viewProducts() {
     connection.query("SELECT * FROM inventory", function (err, res) {
         if (err) throw err;
-        // console.log(res);
+
         if (res.length !== 0) {
             showSQLTable(res);
             start();
@@ -79,7 +79,7 @@ function viewProducts() {
 
 function viewLowProducts(lowQty) {
     connection.query("SELECT * FROM inventory WHERE stock_quantity < " + lowQty, function (err, res) {
-        // console.log(res);
+
         if (res.length !== 0) {
             showSQLTable(res);
             start();
@@ -131,7 +131,6 @@ function addInventory() {
                         selectedItem = res[h];
                     }
                 }
-                // console.log(selectedItem);
 
                 qtyToAdd(selectedItem, inputID);
             } else {
@@ -141,7 +140,7 @@ function addInventory() {
     });
 
     function qtyToAdd(selectedItem, inputID) {
-        // console.log("qtyToAdd function entered.");
+
         Inquirer.prompt(
             {
                 type: "input",
@@ -228,11 +227,10 @@ function addNewProduct() {
             for (let i = 0; i < res.length; i++) {
                 deptList.push(res[i]["department_name"]);
             }
-            // console.log(deptList)
 
             Inquirer.prompt(
                 {
-                    type: "rawlist",
+                    type: "list",
                     name: "department",
                     message: "What department should this go under? [Quit with Q]",
                     choices: deptList
@@ -240,7 +238,6 @@ function addNewProduct() {
             ).then(function (userInput) {
                 if (userInput["department"].toUpperCase() !== "Q") {
                     product["department_name"] = userInput["department"];
-                    // console.log(product);
 
                     requestCost(product);
 
@@ -274,7 +271,6 @@ function addNewProduct() {
         ).then(function (userInput) {
             if (userInput["cost"].toUpperCase() !== "Q") {
                 product["price"] = parseFloat(userInput["cost"]);
-                // console.log(product);
 
                 requestQty(product);
 

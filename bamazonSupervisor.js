@@ -31,20 +31,19 @@ function start() {
             choices: ["View Product Sales by Department", "Create New Department", "Delete a Department", "Exit Bamazon Supervisor"]
         }
     ).then(function (userInput) {
-        // console.log(userInput.task);
         switch (userInput.task) {
             case "View Product Sales by Department":
-                // console.log("For Sale");
                 viewSalesByDept();
                 break;
+
             case "Create New Department":
-                // console.log("Items in inventory");
                 addNewDepartment();
                 break;
+
             case "Delete a Department":
-                // console.log("Deleting a product");
                 deleteDepartment();
                 break;
+
             case "Exit Bamazon Supervisor":
                 quitApp();
                 break;
@@ -55,23 +54,22 @@ function start() {
 
 function viewSalesByDept() {
 
-    // var columns = ["departments.department_id AS Dept.ID", "departments.department_name"];
-    // var table = "departments";
-    // var joinTable = "inventory"
-    // var onColumn = ["inventory.department_name", "departments.department_name"]
+    // connection.query("SELECT departments.department_id AS 'Dept. ID', departments.department_name AS 'Dept. Name', departments.over_head_costs AS 'Dept. Cost', COALESCE(sum(inventory.product_sales), 0) AS 'Product Sales', (COALESCE(sum(inventory.product_sales), 0) - departments.over_head_costs) AS 'Totals' FROM departments LEFT JOIN inventory ON departments.department_name=inventory.department_name GROUP BY departments.department_id ORDER BY departments.department_name", function (err, res) {
 
-    connection.query("SELECT departments.department_id AS 'Dept. ID', departments.department_name AS 'Dept. Name', departments.over_head_costs AS 'Dept. Cost', COALESCE(sum(inventory.product_sales), 0) AS 'Product Sales', (COALESCE(sum(inventory.product_sales), 0) - departments.over_head_costs) AS 'Totals' FROM departments LEFT JOIN inventory ON departments.department_name=inventory.department_name GROUP BY departments.department_id ORDER BY departments.department_name", function (err, res) {
-        // connection.query("SELECT ?? FROM ??",
-        //     [
-        //         columns,
-        //         table
+    //Query same as above for SQL, below is for visual reading.
+    connection.query("SELECT departments.department_id AS 'Dept. ID'," + 
+    "departments.department_name AS 'Dept. Name'," + 
+    " departments.over_head_costs AS 'Dept. Cost'," + 
+    " COALESCE(sum(inventory.product_sales), 0) AS 'Product Sales'," + 
+    " (COALESCE(sum(inventory.product_sales), 0) - departments.over_head_costs) AS 'Totals'" + 
+    " FROM departments" + 
+    " LEFT JOIN inventory ON departments.department_name=inventory.department_name" + 
+    " GROUP BY departments.department_id" + 
+    " ORDER BY departments.department_name", function (err, res) {
 
-        //     ], function (err, res) {
         if (err) throw err;
-        // console.log(res);
 
         if (res.length !== 0) {
-            // console.log("test");
             showSQLTable(res);
             start();
         } else {
@@ -96,7 +94,7 @@ function addNewDepartment() {
             var deptInfo = {};
             deptInfo["department_name"] = userInput["name"];
             requestDeptCosts(deptInfo);
-            // console.log("TO BE UPDATED.");
+
         } else {
             quitApp();
         }
@@ -126,7 +124,6 @@ function addNewDepartment() {
         ).then(function (userInput) {
             if (userInput["cost"].toUpperCase() !== "Q") {
                 deptInfo["over_head_costs"] = parseFloat(userInput["cost"]);
-                // console.log(product);
 
                 addToDB(deptInfo);
 
@@ -202,8 +199,8 @@ function deleteDepartment() {
             ).then(function (userInput) {
                 if (userInput["id"].toUpperCase() !== "Q") {
                     var inputID = parseInt(userInput["id"]);
-                    // console.log("entered")
                     deleteID(inputID);
+
                 } else {
                     quitApp();
                 }
@@ -302,4 +299,3 @@ function showSQLTable(res) {
     };
     console.log(table.toString());
 };
-
