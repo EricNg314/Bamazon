@@ -140,7 +140,7 @@ function addInventory() {
     });
 
     function qtyToAdd(selectedItem, inputID) {
-
+        console.log("\n -------------------------------------------------------------------- \n");
         Inquirer.prompt(
             {
                 type: "input",
