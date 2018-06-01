@@ -6,16 +6,16 @@ A shopping application utilizing node.js and a SQL database.
 Please see "Getting Started" section for prerequisites and installations.
 
 Bamazon Customer:
-![demo](\assets\BamazonCustomer.gif)
+![demo](/assets/BamazonCustomer.gif)
 
 Bamazon Manager (Part 1):
-![demo](\assets\BamazonManager_part1.gif)
+![demo](/assets/BamazonManager_part1.gif)
 
 Bamazon Manager (Part 2):
-![demo](\assets\BamazonManager_part2.gif)
+![demo](/assets/BamazonManager_part2.gif)
 
 Bamazon Supervisor:
-![demo](\assets\BamazonSupervisor.gif)
+![demo](/assets/BamazonSupervisor.gif)
 
 ## Getting Started :loudspeaker:
 This repo utilizes various packages from Node Package Manager(NPM).
