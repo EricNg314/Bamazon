@@ -3,7 +3,7 @@ require("dotenv").config();
 var Mysql = require("mysql");
 var Inquirer = require("inquirer");
 var Table = require("cli-table2");
-
+var Colors = require("colors");
 var keys = require("./keys.js")
 
 var connection = Mysql.createConnection({
@@ -17,6 +17,11 @@ var connection = Mysql.createConnection({
     user: keys.mysqlKey["mysql_DB_user"],
     password: keys.mysqlKey["mysql_DB_password"],
     database: "bamazon_DB"
+});
+
+//Using Color's setThemes to create custom themes.
+Colors.setTheme({
+    sqlHeaders: ['yellow', 'underline']
 });
 
 connection.connect(function (err) {
@@ -202,7 +207,7 @@ function showSQLTable(res) {
     var keysCleaned = [];
     for (let i = 0; i < keys.length; i++) {
         if (keys[i] !== "product_sales") {
-            keysCleaned.push(keys[i]);
+            keysCleaned.push((keys[i]).sqlHeaders);
         };
     }
 

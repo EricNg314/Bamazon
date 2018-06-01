@@ -79,6 +79,7 @@ This repo utilizes various packages from Node Package Manager(NPM).
 * [NPM - Inquire](https://www.npmjs.com/package/inquirer) - A node package for retrieving user input.
 * [NPM - MySQL](https://www.npmjs.com/package/mysql) - A node package for retrieving/updating data from a SQL server.
 * [NPM - CLI Table 2](https://www.npmjs.com/package/cli-table2) - A node package for rendering arrays into tables.
+* [NPM - Colors](https://www.npmjs.com/package/colors) - A node package for custom colors and styles.
 * [NPM - Dotenv](https://www.npmjs.com/package/dotenv) - A node package to help store sensitive information.
 
 ## Authors :squirrel: 

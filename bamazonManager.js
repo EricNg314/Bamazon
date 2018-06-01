@@ -3,7 +3,7 @@ require("dotenv").config();
 var Mysql = require("mysql");
 var Inquirer = require("inquirer");
 var Table = require("cli-table2");
-
+var Colors = require("colors");
 var keys = require("./keys.js");
 
 var connection = Mysql.createConnection({
@@ -13,6 +13,10 @@ var connection = Mysql.createConnection({
     password: keys.mysqlKey["mysql_DB_password"],
     database: "bamazon_DB"
 
+});
+
+Colors.setTheme({
+    sqlHeaders: ['yellow', 'underline']
 });
 
 connection.connect(function (err) {
@@ -462,14 +466,21 @@ function quitApp() {
 
 function showSQLTable(res) {
     var keys = Object.keys(res[0]);
+    var coloredKeys = [];
+    for (var i = 0; i < keys.length; i++) {
+        // coloredKeys.push(Colors.yellow(keys[i]));
+        coloredKeys.push((keys[i]).sqlHeaders);
+    }
+
     var table = new Table({
-        head: keys
+        head: coloredKeys
     });
 
     for (let i = 0; i < res.length; i++) {
         var rowData = [];
         for (var objKeys in res[i]) {
             rowData.push(res[i][objKeys]);
+
         }
         table.push(rowData);
     };

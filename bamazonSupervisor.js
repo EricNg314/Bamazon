@@ -3,7 +3,7 @@ require("dotenv").config();
 var Mysql = require("mysql");
 var Inquirer = require("inquirer");
 var Table = require("cli-table2");
-
+var Colors = require("colors");
 var keys = require("./keys.js");
 
 var connection = Mysql.createConnection({
@@ -14,6 +14,12 @@ var connection = Mysql.createConnection({
     database: "bamazon_DB"
 
 });
+
+//Using Color's setThemes to create custom themes.
+Colors.setTheme({
+    sqlHeaders: ['yellow', 'underline']
+});
+
 
 connection.connect(function (err) {
     if (err) throw err;
@@ -57,26 +63,26 @@ function viewSalesByDept() {
     // connection.query("SELECT departments.department_id AS 'Dept. ID', departments.department_name AS 'Dept. Name', departments.over_head_costs AS 'Dept. Cost', COALESCE(sum(inventory.product_sales), 0) AS 'Product Sales', (COALESCE(sum(inventory.product_sales), 0) - departments.over_head_costs) AS 'Totals' FROM departments LEFT JOIN inventory ON departments.department_name=inventory.department_name GROUP BY departments.department_id ORDER BY departments.department_name", function (err, res) {
 
     //Query same as above for SQL, below is for visual reading.
-    connection.query("SELECT departments.department_id AS 'Dept. ID'," + 
-    "departments.department_name AS 'Dept. Name'," + 
-    " departments.over_head_costs AS 'Dept. Cost'," + 
-    " COALESCE(sum(inventory.product_sales), 0) AS 'Product Sales'," + 
-    " (COALESCE(sum(inventory.product_sales), 0) - departments.over_head_costs) AS 'Totals'" + 
-    " FROM departments" + 
-    " LEFT JOIN inventory ON departments.department_name=inventory.department_name" + 
-    " GROUP BY departments.department_id" + 
-    " ORDER BY departments.department_name", function (err, res) {
+    connection.query("SELECT departments.department_id AS 'Dept. ID'," +
+        "departments.department_name AS 'Dept. Name'," +
+        " departments.over_head_costs AS 'Dept. Cost'," +
+        " COALESCE(sum(inventory.product_sales), 0) AS 'Product Sales'," +
+        " (COALESCE(sum(inventory.product_sales), 0) - departments.over_head_costs) AS 'Totals'" +
+        " FROM departments" +
+        " LEFT JOIN inventory ON departments.department_name=inventory.department_name" +
+        " GROUP BY departments.department_id" +
+        " ORDER BY departments.department_name", function (err, res) {
 
-        if (err) throw err;
+            if (err) throw err;
 
-        if (res.length !== 0) {
-            showSQLTable(res);
-            start();
-        } else {
-            console.log("Sorry no items available.");
-            start();
-        };
-    });
+            if (res.length !== 0) {
+                showSQLTable(res);
+                start();
+            } else {
+                console.log("Sorry no items available.");
+                start();
+            };
+        });
 };
 
 
@@ -283,10 +289,16 @@ function quitApp() {
 
 
 function showSQLTable(res) {
+
     var keys = Object.keys(res[0]);
+    var coloredKeys = [];
+    for (var i = 0; i < keys.length; i++) {
+        // coloredKeys.push(Colors.yellow(keys[i]));
+        coloredKeys.push((keys[i]).sqlHeaders);
+    }
 
     var table = new Table({
-        head: keys
+        head: coloredKeys
     });
 
     for (let i = 0; i < res.length; i++) {
